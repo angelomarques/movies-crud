@@ -1,6 +1,6 @@
 import { useMutation, type UseMutationOptions } from "@tanstack/react-query";
-import { login } from ".";
-import type { LoginPayload } from "./types";
+import { login, signUp } from ".";
+import type { LoginPayload, SignUpPayload } from "./types";
 
 export function useLoginMutation(
   options?: Omit<
@@ -10,6 +10,18 @@ export function useLoginMutation(
 ) {
   return useMutation({
     mutationFn: login,
+    ...options,
+  });
+}
+
+export function useSignUpMutation(
+  options?: Omit<
+    UseMutationOptions<string, Error, SignUpPayload, unknown>,
+    "mutationFn"
+  >
+) {
+  return useMutation({
+    mutationFn: signUp,
     ...options,
   });
 }

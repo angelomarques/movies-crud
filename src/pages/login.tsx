@@ -19,12 +19,15 @@ import { Input } from "@/components/ui/input";
 import { useLoginMutation } from "@/service/auth/mutations";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import { Link } from "react-router-dom";
 import { toast } from "sonner";
 import { z } from "zod";
 
 const formSchema = z.object({
-  email: z.string().email("Email inválido"),
-  password: z.string().min(6, {
+  email: z
+    .string({ required_error: "Campo obrigatório" })
+    .email("Email inválido"),
+  password: z.string({ required_error: "Campo obrigatório" }).min(6, {
     message: "A senha deve conter no mínimo 6 caracteres",
   }),
 });
@@ -99,6 +102,13 @@ export function LoginPage() {
                   </FormItem>
                 )}
               />
+
+              <p className="text-sm text-right text-muted-foreground">
+                Não possui conta?{" "}
+                <Link to="/sign-up" className="underline">
+                  Cadastre-se
+                </Link>
+              </p>
             </CardContent>
 
             <CardFooter>

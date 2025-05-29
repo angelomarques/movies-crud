@@ -1,4 +1,5 @@
 import { ToggleThemeButton } from "@/components/toggle-theme-button";
+import { Toaster } from "@/components/ui/sonner";
 import { Film } from "lucide-react";
 import { Link, Outlet } from "react-router-dom";
 
@@ -21,6 +22,8 @@ export function MainLayout() {
       </header>
 
       <Outlet />
+
+      <Toaster />
     </div>
   );
 }

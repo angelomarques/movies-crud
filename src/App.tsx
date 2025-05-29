@@ -1,3 +1,4 @@
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
   createBrowserRouter,
   createRoutesFromElements,
@@ -5,11 +6,11 @@ import {
   RouterProvider,
 } from "react-router-dom";
 import { ThemeProvider } from "./components/theme-provider";
+import { AuthRouteLayout } from "./layouts/auth-route";
 import { MainLayout } from "./layouts/main";
 import { ProtectedRouteLayout } from "./layouts/protected-route";
 import { HomePage } from "./pages/home";
 import { LoginPage } from "./pages/login";
-import { AuthRouteLayout } from "./layouts/auth-route";
 import { SignUpPage } from "./pages/sign-up";
 
 const router = createBrowserRouter(
@@ -27,10 +28,14 @@ const router = createBrowserRouter(
   )
 );
 
+const queryClient = new QueryClient();
+
 function App() {
   return (
     <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-      <RouterProvider router={router} />
+      <QueryClientProvider client={queryClient}>
+        <RouterProvider router={router} />
+      </QueryClientProvider>
     </ThemeProvider>
   );
 }

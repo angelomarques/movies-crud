@@ -16,8 +16,10 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { useLoginMutation } from "@/service/auth/mutations";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import { z } from "zod";
 
 const formSchema = z.object({
@@ -37,8 +39,14 @@ export function LoginPage() {
     },
   });
 
+  const { mutateAsync, isPending } = useLoginMutation();
+
   function onSubmit(values: FormSchemaType) {
-    console.log(values);
+    toast.promise(() => mutateAsync(values), {
+      success: "Login realizado com sucesso",
+      loading: "Carregando...",
+      error: "Houve um erro ao realizar o login. Tente novamente mais tarde",
+    });
   }
 
   return (
@@ -56,6 +64,7 @@ export function LoginPage() {
               <FormField
                 control={form.control}
                 name="email"
+                disabled={isPending}
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Email</FormLabel>
@@ -74,6 +83,7 @@ export function LoginPage() {
               <FormField
                 control={form.control}
                 name="password"
+                disabled={isPending}
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Senha</FormLabel>
@@ -92,7 +102,7 @@ export function LoginPage() {
             </CardContent>
 
             <CardFooter>
-              <Button type="submit" className="ml-auto">
+              <Button disabled={isPending} type="submit" className="ml-auto">
                 Entrar
               </Button>
             </CardFooter>

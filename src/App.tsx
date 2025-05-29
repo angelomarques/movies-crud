@@ -6,12 +6,23 @@ import {
 } from "react-router-dom";
 import { ThemeProvider } from "./components/theme-provider";
 import { MainLayout } from "./layouts/main";
+import { ProtectedRouteLayout } from "./layouts/protected-route";
 import { HomePage } from "./pages/home";
+import { LoginPage } from "./pages/login";
+import { AuthRouteLayout } from "./layouts/auth-route";
+import { SignUpPage } from "./pages/sign-up";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
     <Route path="/" element={<MainLayout />}>
-      <Route index element={<HomePage />} />
+      <Route element={<ProtectedRouteLayout />}>
+        <Route index element={<HomePage />} />
+      </Route>
+
+      <Route element={<AuthRouteLayout />}>
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/sign-up" element={<SignUpPage />} />
+      </Route>
     </Route>
   )
 );

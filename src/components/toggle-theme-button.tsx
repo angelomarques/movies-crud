@@ -1,16 +1,23 @@
 import { useTheme } from "@/hooks/use-theme";
-import { Button } from "./ui/button";
+import { Moon, Sun } from "lucide-react";
+import { Switch } from "./ui/switch";
 
 export function ToggleThemeButton() {
   const { theme, setTheme } = useTheme();
 
-  function toggleTheme() {
-    setTheme(theme === "light" ? "dark" : "light");
+  function toggleTheme(isDark: boolean) {
+    setTheme(isDark ? "dark" : "light");
   }
 
   return (
-    <Button onClick={toggleTheme} variant="destructive">
-      Toggle Theme
-    </Button>
+    <div className="flex items-center space-x-3">
+      <Sun className="size-4" />
+      <Switch
+        checked={theme === "dark"}
+        onCheckedChange={(value) => toggleTheme(value)}
+        aria-label="Toggle theme"
+      />
+      <Moon className="size-4" />
+    </div>
   );
 }

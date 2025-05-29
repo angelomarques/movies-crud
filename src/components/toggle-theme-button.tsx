@@ -10,7 +10,7 @@ export function ToggleThemeButton() {
   }
 
   return (
-    <div className="flex items-center space-x-3">
+    <div className="flex items-center space-x-3 flex-1 justify-end">
       <Sun className="size-4" />
       <Switch
         checked={theme === "dark"}

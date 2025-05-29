@@ -1,10 +1,25 @@
+import {
+  createBrowserRouter,
+  createRoutesFromElements,
+  Route,
+  RouterProvider,
+} from "react-router-dom";
 import { ThemeProvider } from "./components/theme-provider";
-import { ToggleThemeButton } from "./components/toggle-theme-button";
+import { MainLayout } from "./layouts/main";
+import { HomePage } from "./pages/home";
+
+const router = createBrowserRouter(
+  createRoutesFromElements(
+    <Route path="/" element={<MainLayout />}>
+      <Route index element={<HomePage />} />
+    </Route>
+  )
+);
 
 function App() {
   return (
     <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-      <ToggleThemeButton />
+      <RouterProvider router={router} />
     </ThemeProvider>
   );
 }

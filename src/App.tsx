@@ -1,10 +1,11 @@
-import { Button } from "./components/ui/button";
+import { ThemeProvider } from "./components/theme-provider";
+import { ToggleThemeButton } from "./components/toggle-theme-button";
 
 function App() {
   return (
-    <>
-      <Button variant="destructive">hello world</Button>
-    </>
+    <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+      <ToggleThemeButton />
+    </ThemeProvider>
   );
 }
 

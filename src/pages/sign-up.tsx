@@ -19,27 +19,34 @@ import { Input } from "@/components/ui/input";
 import { useSignUpMutation } from "@/service/auth/mutations";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { z } from "zod";
 
-const formSchema = z.object({
-  name: z.string({ required_error: "Campo obrigatório" }).min(2, {
-    message: "O nome deve conter no mínimo 2 caracteres",
-  }),
-  email: z
-    .string({ required_error: "Campo obrigatório" })
-    .email("Email inválido"),
-  password: z.string({ required_error: "Campo obrigatório" }).min(6, {
-    message: "A senha deve conter no mínimo 6 caracteres",
-  }),
-  confirmPassword: z.string({ required_error: "Campo obrigatório" }).min(6, {
-    message: "A senha deve conter no mínimo 6 caracteres",
-  }),
-});
+const formSchema = z
+  .object({
+    name: z.string({ required_error: "Campo obrigatório" }).min(2, {
+      message: "O nome deve conter no mínimo 2 caracteres",
+    }),
+    email: z
+      .string({ required_error: "Campo obrigatório" })
+      .email("Email inválido"),
+    password: z.string({ required_error: "Campo obrigatório" }).min(6, {
+      message: "A senha deve conter no mínimo 6 caracteres",
+    }),
+    confirmPassword: z.string({ required_error: "Campo obrigatório" }).min(6, {
+      message: "A senha deve conter no mínimo 6 caracteres",
+    }),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "As senhas não conferem",
+    path: ["confirmPassword"],
+  });
 
 type FormSchemaType = z.infer<typeof formSchema>;
 
 export function SignUpPage() {
+  const navigate = useNavigate();
   const form = useForm<FormSchemaType>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -47,7 +54,11 @@ export function SignUpPage() {
     },
   });
 
-  const { mutateAsync, isPending } = useSignUpMutation();
+  const { mutateAsync, isPending } = useSignUpMutation({
+    onSuccess: () => {
+      navigate("/login");
+    },
+  });
 
   function onSubmit(values: FormSchemaType) {
     toast.promise(() => mutateAsync(values), {

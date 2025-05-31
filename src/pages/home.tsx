@@ -1,3 +1,4 @@
+import { CreateMovieFormDialog } from "@/components/create-movie-form-dialog";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -172,7 +173,7 @@ export function HomePage() {
         />
 
         <div className="flex gap-2 ml-auto">
-          <Button>Criar Filme</Button>
+          <CreateMovieFormDialog />
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>

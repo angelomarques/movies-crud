@@ -25,6 +25,8 @@ import {
 } from "./ui/dialog";
 import { Textarea } from "./ui/textarea";
 import { DatePicker } from "./ui/date-picker";
+import { UploadInput } from "./ui/upload";
+import { handleUpload } from "@/service/files";
 
 const formSchema = z.object({
   title: z.string({ required_error: "Campo obrigatório" }).min(2, {
@@ -82,6 +84,21 @@ export function CreateMovieFormDialog() {
       loading: "Carregando...",
       error: "Houve um erro ao cadastrar o filme. Tente novamente mais tarde",
     });
+  }
+
+  async function uploadService(file: File, onChange: (value: string) => void) {
+    try {
+      const { url } = await handleUpload(file);
+
+      onChange(url);
+
+      return { success: true, url };
+    } catch (_error) {
+      toast.error(
+        "Erro ao fazer upload da imagem. Tente novamente mais tarde."
+      );
+      return { success: false };
+    }
   }
 
   return (
@@ -225,8 +242,20 @@ export function CreateMovieFormDialog() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Imagem</FormLabel>
+                    <UploadInput
+                      uploadService={(file) =>
+                        uploadService(file, field.onChange)
+                      }
+                      acceptedFileTypes=".jpg,.jpeg,.png"
+                      customFileName="capa"
+                      maxFiles={1}
+                    />
                     <FormControl>
-                      <Input placeholder="Digite a imagem" {...field} />
+                      <Input
+                        type="hidden"
+                        placeholder="Digite a imagem"
+                        {...field}
+                      />
                     </FormControl>
 
                     <FormMessage />

@@ -1,8 +1,9 @@
+import { useAuthStore } from "@/store/auth";
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 
 export function ProtectedRouteLayout() {
-  // TODO: implement authentication logic
-  const isAuthenticated = true;
+  const token = useAuthStore((state) => state.token);
+  const isAuthenticated = !!token;
 
   const location = useLocation();
 

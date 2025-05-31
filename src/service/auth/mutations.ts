@@ -1,10 +1,10 @@
 import { useMutation, type UseMutationOptions } from "@tanstack/react-query";
 import { login, signUp } from ".";
-import type { LoginPayload, SignUpPayload } from "./types";
+import type { LoginPayload, LoginResponse, SignUpPayload } from "./types";
 
 export function useLoginMutation(
   options?: Omit<
-    UseMutationOptions<string, Error, LoginPayload, unknown>,
+    UseMutationOptions<LoginResponse, Error, LoginPayload, unknown>,
     "mutationFn"
   >
 ) {
@@ -16,7 +16,7 @@ export function useLoginMutation(
 
 export function useSignUpMutation(
   options?: Omit<
-    UseMutationOptions<string, Error, SignUpPayload, unknown>,
+    UseMutationOptions<void, Error, SignUpPayload, unknown>,
     "mutationFn"
   >
 ) {

@@ -1,8 +1,9 @@
+import { useAuthStore } from "@/store/auth";
 import { Navigate, Outlet } from "react-router-dom";
 
 export function AuthRouteLayout() {
-  // TODO: implement authentication logic
-  const isAuthenticated = true;
+  const token = useAuthStore((state) => state.token);
+  const isAuthenticated = !!token;
 
   if (isAuthenticated) {
     return <Navigate to="/" replace />;

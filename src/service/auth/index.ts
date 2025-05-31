@@ -1,11 +1,10 @@
 import { api } from "@/lib/api";
-import type { LoginPayload, SignUpPayload } from "./types";
+import type { LoginPayload, LoginResponse, SignUpPayload } from "./types";
 
-export function login(payload: LoginPayload) {
-  // TODO: implement it
-  return new Promise((resolve) =>
-    setTimeout(() => resolve("success"), 3000)
-  ) as Promise<string>;
+export async function login(payload: LoginPayload): Promise<LoginResponse> {
+  const { data } = await api.post<LoginResponse>("/auth/login", payload);
+
+  return data;
 }
 
 export async function signUp(payload: SignUpPayload) {

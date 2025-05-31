@@ -17,9 +17,10 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useLoginMutation } from "@/service/auth/mutations";
+import { useAuthStore } from "@/store/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { z } from "zod";
 
@@ -35,6 +36,9 @@ const formSchema = z.object({
 type FormSchemaType = z.infer<typeof formSchema>;
 
 export function LoginPage() {
+  const navigate = useNavigate();
+  const setToken = useAuthStore((state) => state.setToken);
+
   const form = useForm<FormSchemaType>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -42,7 +46,12 @@ export function LoginPage() {
     },
   });
 
-  const { mutateAsync, isPending } = useLoginMutation();
+  const { mutateAsync, isPending } = useLoginMutation({
+    onSuccess: (data) => {
+      setToken(data.token);
+      navigate("/");
+    },
+  });
 
   function onSubmit(values: FormSchemaType) {
     toast.promise(() => mutateAsync(values), {

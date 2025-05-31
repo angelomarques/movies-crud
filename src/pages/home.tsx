@@ -1,4 +1,5 @@
 import { CreateMovieFormDialog } from "@/components/create-movie-form-dialog";
+import { FilterFormDialog } from "@/components/filter-form-dialog";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -18,7 +19,7 @@ import {
 } from "@/components/ui/table";
 import { formatBRL } from "@/lib/utils";
 import { useGetMoviesQuery } from "@/service/movies/queries";
-import type { Movie } from "@/service/movies/types";
+import type { DurationCategory, Movie } from "@/service/movies/types";
 import type {
   ColumnDef,
   ColumnFiltersState,
@@ -36,6 +37,7 @@ import {
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { ArrowUpDown, ChevronDown, MoreHorizontal } from "lucide-react";
+import { useQueryState } from "nuqs";
 import { useState } from "react";
 
 const columns: ColumnDef<Movie>[] = [
@@ -118,9 +120,16 @@ export function HomePage() {
     pageSize: 10,
   });
 
+  const [startDate] = useQueryState("startDate");
+  const [endDate] = useQueryState("endDate");
+  const [durationCategory] = useQueryState("durationCategory");
+
   const { data: moviesQuery } = useGetMoviesQuery({
     page: pagination.pageIndex + 1,
     limit: pagination.pageSize,
+    startDate: startDate ?? undefined,
+    endDate: endDate ?? undefined,
+    durationCategory: durationCategory as DurationCategory | undefined,
   });
 
   const table = useReactTable({
@@ -151,14 +160,18 @@ export function HomePage() {
       <h1 className="font-semibold text-3xl">Gerenciar Filmes</h1>
 
       <div className="flex items-center py-4">
-        <Input
-          placeholder="Pesquisar título..."
-          value={(table.getColumn("title")?.getFilterValue() as string) ?? ""}
-          onChange={(event) =>
-            table.getColumn("title")?.setFilterValue(event.target.value)
-          }
-          className="max-w-sm"
-        />
+        <div className="flex gap-2 items-center">
+          <Input
+            placeholder="Pesquisar título..."
+            value={(table.getColumn("title")?.getFilterValue() as string) ?? ""}
+            onChange={(event) =>
+              table.getColumn("title")?.setFilterValue(event.target.value)
+            }
+            className="max-w-sm"
+          />
+
+          <FilterFormDialog />
+        </div>
 
         <div className="flex gap-2 ml-auto">
           <CreateMovieFormDialog />

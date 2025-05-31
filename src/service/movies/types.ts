@@ -15,9 +15,14 @@ export type CreateMoviePayload = Omit<Movie, "id" | "createdAt" | "updatedAt">;
 // TODO: implement it
 // export type UpdateMoviePayload = Partial<CreateMoviePayload>;
 
+export type DurationCategory = "short" | "medium" | "long";
+
 export type GetMoviesParams = {
   page?: number;
   limit?: number;
+  startDate?: string;
+  endDate?: string;
+  durationCategory?: DurationCategory;
 };
 
 export type GetMoviesResponse = {

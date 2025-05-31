@@ -36,7 +36,7 @@ const formSchema = z.object({
   releaseDate: z.string({ required_error: "Campo obrigatório" }),
   budget: z
     .number({ required_error: "Campo obrigatório" })
-    .min(0, { message: "O orçamento deve ser um número positivo" }),
+    .min(1, { message: "O orçamento deve ser maior que 1" }),
   imageUrl: z.string({ required_error: "Campo obrigatório" }).url({
     message: "A URL da imagem deve ser válida",
   }),
@@ -133,6 +133,7 @@ export function CreateMovieFormDialog() {
               <FormField
                 control={form.control}
                 name="description"
+                disabled={isPending}
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Descrição</FormLabel>

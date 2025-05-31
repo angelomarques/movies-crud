@@ -1,5 +1,6 @@
 import { format } from "date-fns";
 import { Calendar as CalendarIcon } from "lucide-react";
+import { ptBR } from "date-fns/locale";
 
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
@@ -28,7 +29,7 @@ export function DatePicker({ value, onChange }: Props) {
         >
           <CalendarIcon className="mr-2 h-4 w-4" />
           {value ? (
-            format(value, "dd/MM/yyyy")
+            format(value, "PPP", { locale: ptBR })
           ) : (
             <span>Selecione uma data</span>
           )}

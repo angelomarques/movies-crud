@@ -16,6 +16,15 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { formatBRL } from "@/lib/utils";
+import { useGetMoviesQuery } from "@/service/movies/queries";
+import type { Movie } from "@/service/movies/types";
+import type {
+  ColumnDef,
+  ColumnFiltersState,
+  SortingState,
+  VisibilityState,
+} from "@tanstack/react-table";
 import {
   flexRender,
   getCoreRowModel,
@@ -24,54 +33,10 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import type {
-  ColumnDef,
-  ColumnFiltersState,
-  SortingState,
-  VisibilityState,
-} from "@tanstack/react-table";
+import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
 import { ArrowUpDown, ChevronDown, MoreHorizontal } from "lucide-react";
 import { useState } from "react";
-
-const data: Movie[] = [
-  {
-    id: "m5gr84i9",
-    title: "Filme 1",
-    releaseDate: "24 de janeiro de 2026",
-    budget: 350000000,
-  },
-  {
-    id: "m5ar84i9",
-    title: "Filme 2",
-    releaseDate: "24 de janeiro de 2026",
-    budget: 323000000,
-  },
-  {
-    id: "m5gr8489",
-    title: "Filme 3",
-    releaseDate: "24 de janeiro de 2026",
-    budget: 350000000,
-  },
-  {
-    id: "m5gr8419",
-    title: "Filme 4",
-    releaseDate: "24 de janeiro de 2026",
-    budget: 350000000,
-  },
-  {
-    id: "m5gc84i9",
-    title: "Filme 5",
-    releaseDate: "24 de janeiro de 2026",
-    budget: 350000000,
-  },
-];
-
-type Movie = {
-  id: string;
-  title: string;
-  releaseDate: string;
-  budget: number;
-};
 
 const columns: ColumnDef<Movie>[] = [
   {
@@ -87,27 +52,37 @@ const columns: ColumnDef<Movie>[] = [
         </Button>
       );
     },
-    cell: ({ row }) => <div className="lowercase">{row.getValue("title")}</div>,
+    cell: ({ row }) => <div>{row.getValue("title")}</div>,
   },
   {
     accessorKey: "budget",
     enableHiding: true,
     header: () => <div className="text-right">Orçamento</div>,
     cell: ({ row }) => {
-      const budget = parseFloat(row.getValue("budget"));
+      const budget = formatBRL(parseFloat(row.getValue("budget")));
 
       return <div className="text-right font-medium">{budget}</div>;
+    },
+  },
+  {
+    accessorKey: "duration",
+    enableHiding: true,
+    header: () => <div className="text-right">Duração (minutos)</div>,
+    cell: ({ row }) => {
+      const duration = parseFloat(row.getValue("duration"));
+
+      return <div className="text-right font-medium">{duration}</div>;
     },
   },
   {
     accessorKey: "releaseDate",
     header: () => <div className="text-right">Data de Lançamento</div>,
     cell: ({ row }) => {
-      return (
-        <div className="text-right font-medium">
-          {row.getValue("releaseDate")}
-        </div>
-      );
+      const releaseDate = format(new Date(row.getValue("releaseDate")), "PPP", {
+        locale: ptBR,
+      });
+
+      return <div className="text-right font-medium">{releaseDate}</div>;
     },
   },
   {
@@ -138,9 +113,18 @@ export function HomePage() {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
+  const [pagination, setPagination] = useState({
+    pageIndex: 0,
+    pageSize: 10,
+  });
+
+  const { data: moviesQuery } = useGetMoviesQuery({
+    page: pagination.pageIndex + 1,
+    limit: pagination.pageSize,
+  });
 
   const table = useReactTable({
-    data,
+    data: moviesQuery?.data || [],
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -150,11 +134,15 @@ export function HomePage() {
     getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
     onRowSelectionChange: setRowSelection,
+    onPaginationChange: setPagination,
+    manualPagination: true,
+    rowCount: moviesQuery?.meta?.total,
     state: {
       sorting,
       columnFilters,
       columnVisibility,
       rowSelection,
+      pagination,
     },
   });
 
@@ -253,6 +241,31 @@ export function HomePage() {
             )}
           </TableBody>
         </Table>
+      </div>
+
+      <div className="flex items-center justify-end space-x-2 py-4">
+        <div className="text-muted-foreground flex-1 text-sm">
+          Página {pagination.pageIndex + 1} de{" "}
+          {moviesQuery?.meta?.totalPages || 0}
+        </div>
+        <div className="space-x-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => table.previousPage()}
+            disabled={!table.getCanPreviousPage()}
+          >
+            Previous
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => table.nextPage()}
+            disabled={!table.getCanNextPage()}
+          >
+            Next
+          </Button>
+        </div>
       </div>
     </div>
   );

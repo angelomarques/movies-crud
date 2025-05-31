@@ -14,3 +14,19 @@ export type Movie = {
 export type CreateMoviePayload = Omit<Movie, "id" | "createdAt" | "updatedAt">;
 // TODO: implement it
 // export type UpdateMoviePayload = Partial<CreateMoviePayload>;
+
+export type GetMoviesParams = {
+  page?: number;
+  limit?: number;
+};
+
+export type GetMoviesResponse = {
+  data: Movie[];
+  meta: {
+    total: number;
+    page: number;
+    limit: number;
+    count: number;
+    totalPages: number;
+  };
+};

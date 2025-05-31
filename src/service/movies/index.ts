@@ -1,10 +1,22 @@
 import { api } from "@/lib/api";
-import type { CreateMoviePayload, Movie } from "./types";
+import type {
+  CreateMoviePayload,
+  GetMoviesParams,
+  GetMoviesResponse,
+  Movie,
+} from "./types";
 
-// TODO: implement
-export async function getMovies() {
-  //   const { data } = await api.get<Movie[]>("/movies");
-  //   return data;
+export async function getMovies(params: GetMoviesParams = {}) {
+  const { page, limit } = params;
+
+  const { data } = await api.get<GetMoviesResponse>("/movies", {
+    params: {
+      page: page || 1,
+      limit: limit || 10,
+    },
+  });
+
+  return data;
 }
 
 export async function createMovie(payload: CreateMoviePayload) {

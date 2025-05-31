@@ -27,6 +27,7 @@ import { Textarea } from "./ui/textarea";
 import { DatePicker } from "./ui/date-picker";
 import { UploadInput } from "./ui/upload";
 import { handleUpload } from "@/service/files";
+import { useQueryClient } from "@tanstack/react-query";
 
 const formSchema = z.object({
   title: z.string({ required_error: "Campo obrigatório" }).min(2, {
@@ -51,6 +52,7 @@ const formSchema = z.object({
 type FormSchemaType = z.infer<typeof formSchema>;
 
 export function CreateMovieFormDialog() {
+  const queryClient = useQueryClient();
   const form = useForm<FormSchemaType>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -71,6 +73,7 @@ export function CreateMovieFormDialog() {
 
   const { mutateAsync, isPending } = useCreateMovieMutation({
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["movies"] });
       closeModal();
       form.reset();
     },

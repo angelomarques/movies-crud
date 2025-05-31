@@ -8,6 +8,7 @@ export type Movie = {
   releaseDate: string;
   budget: number;
   imageUrl: string;
+  duration: number;
 };
 
 export type CreateMoviePayload = Omit<Movie, "id" | "createdAt" | "updatedAt">;

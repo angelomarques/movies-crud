@@ -24,6 +24,7 @@ import {
   DialogTrigger,
 } from "./ui/dialog";
 import { Textarea } from "./ui/textarea";
+import { DatePicker } from "./ui/date-picker";
 
 const formSchema = z.object({
   title: z.string({ required_error: "Campo obrigatório" }).min(2, {
@@ -33,13 +34,16 @@ const formSchema = z.object({
     message: "O título original deve conter no mínimo 2 caracteres",
   }),
   description: z.string({ required_error: "Campo obrigatório" }),
-  releaseDate: z.string({ required_error: "Campo obrigatório" }),
+  releaseDate: z.date({ required_error: "Campo obrigatório" }),
   budget: z
     .number({ required_error: "Campo obrigatório" })
     .min(1, { message: "O orçamento deve ser maior que 1" }),
   imageUrl: z.string({ required_error: "Campo obrigatório" }).url({
     message: "A URL da imagem deve ser válida",
   }),
+  duration: z
+    .number({ required_error: "Campo obrigatório" })
+    .min(1, { message: "O orçamento deve ser maior que 1" }),
 });
 
 type FormSchemaType = z.infer<typeof formSchema>;
@@ -51,9 +55,9 @@ export function CreateMovieFormDialog() {
       title: "",
       originalTitle: "",
       description: "",
-      releaseDate: "",
       budget: 0,
       imageUrl: "",
+      duration: 0,
     },
   });
 
@@ -71,7 +75,9 @@ export function CreateMovieFormDialog() {
   });
 
   function onSubmit(values: FormSchemaType) {
-    toast.promise(() => mutateAsync(values), {
+    const dateToString = values.releaseDate.toISOString();
+
+    toast.promise(() => mutateAsync({ ...values, releaseDate: dateToString }), {
       success: "Filme Cadastrado realizado com sucesso",
       loading: "Carregando...",
       error: "Houve um erro ao cadastrar o filme. Tente novamente mais tarde",
@@ -158,10 +164,7 @@ export function CreateMovieFormDialog() {
                   <FormItem>
                     <FormLabel>Data de lançamento</FormLabel>
                     <FormControl>
-                      <Input
-                        placeholder="Digite a Data de lançamento"
-                        {...field}
-                      />
+                      <DatePicker {...field} />
                     </FormControl>
 
                     <FormMessage />
@@ -180,6 +183,29 @@ export function CreateMovieFormDialog() {
                       <Input
                         type="number"
                         placeholder="Digite o orçamento"
+                        {...field}
+                        onChange={(event) =>
+                          field.onChange(+event.target.value)
+                        }
+                      />
+                    </FormControl>
+
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="duration"
+                disabled={isPending}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Duração (minutos)</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        placeholder="Digite a duração"
                         {...field}
                         onChange={(event) =>
                           field.onChange(+event.target.value)

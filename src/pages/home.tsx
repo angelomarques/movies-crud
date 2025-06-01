@@ -1,5 +1,6 @@
 import { CreateMovieFormDialog } from "@/components/create-movie-form-dialog";
 import { FilterFormDialog } from "@/components/filter-form-dialog";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -17,7 +18,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { formatBRL } from "@/lib/utils";
+import { formatBRL, getDurationCategoryLabel } from "@/lib/utils";
 import { useGetMoviesQuery } from "@/service/movies/queries";
 import type { DurationCategory, Movie } from "@/service/movies/types";
 import type {
@@ -39,6 +40,7 @@ import { ptBR } from "date-fns/locale";
 import { ArrowUpDown, ChevronDown, MoreHorizontal } from "lucide-react";
 import { useQueryState } from "nuqs";
 import { useState } from "react";
+import { start } from "repl";
 
 const columns: ColumnDef<Movie>[] = [
   {
@@ -120,9 +122,10 @@ export function HomePage() {
     pageSize: 10,
   });
 
-  const [startDate] = useQueryState("startDate");
-  const [endDate] = useQueryState("endDate");
-  const [durationCategory] = useQueryState("durationCategory");
+  const [startDate, setStartDate] = useQueryState("startDate");
+  const [endDate, setEndDate] = useQueryState("endDate");
+  const [durationCategory, setDurationCategory] =
+    useQueryState("durationCategory");
 
   const { data: moviesQuery } = useGetMoviesQuery({
     page: pagination.pageIndex + 1,
@@ -155,6 +158,14 @@ export function HomePage() {
     },
   });
 
+  console.log("start date", startDate);
+
+  function clearFilters() {
+    setStartDate(null);
+    setEndDate(null);
+    setDurationCategory(null);
+  }
+
   return (
     <div className="px-2 mt-5 max-w-6xl mx-auto">
       <h1 className="font-semibold text-3xl">Gerenciar Filmes</h1>
@@ -170,7 +181,9 @@ export function HomePage() {
             className="max-w-sm"
           />
 
-          <FilterFormDialog />
+          <FilterFormDialog
+            key={`${startDate}-${endDate}-${durationCategory}`}
+          />
         </div>
 
         <div className="flex gap-2 ml-auto">
@@ -204,6 +217,39 @@ export function HomePage() {
           </DropdownMenu>
         </div>
       </div>
+
+      {startDate || endDate || durationCategory ? (
+        <div className="mb-3 divide-y flex gap-3 items-center">
+          <Button variant="secondary" onClick={clearFilters}>
+            Limpar filtros de busca
+          </Button>
+
+          {!!startDate && (
+            <Badge>
+              Data de Lançamento mínima:{" "}
+              {format(new Date(startDate), "PPP", {
+                locale: ptBR,
+              })}
+            </Badge>
+          )}
+
+          {!!endDate && (
+            <Badge>
+              Data de Lançamento máxima:{" "}
+              {format(new Date(endDate), "PPP", {
+                locale: ptBR,
+              })}
+            </Badge>
+          )}
+
+          {!!durationCategory && (
+            <Badge>
+              Duração:{" "}
+              {getDurationCategoryLabel(durationCategory as DurationCategory)}
+            </Badge>
+          )}
+        </div>
+      ) : null}
 
       <div className="rounded-md border">
         <Table>

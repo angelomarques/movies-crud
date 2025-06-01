@@ -7,6 +7,8 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { getDurationCategoryLabel } from "@/lib/utils";
+import type { DurationCategory } from "@/service/movies/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQueryState } from "nuqs";
 import { useState } from "react";
@@ -22,7 +24,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "./ui/dialog";
-import type { DurationCategory } from "@/service/movies/types";
 import {
   Select,
   SelectContent,
@@ -145,13 +146,13 @@ export function FilterFormDialog() {
                       </FormControl>
                       <SelectContent>
                         <SelectItem value="short">
-                          Curta (até 50 minutos)
+                          {getDurationCategoryLabel("short")}
                         </SelectItem>
                         <SelectItem value="medium">
-                          Média (entre 51 e 100 minutos)
+                          {getDurationCategoryLabel("medium")}
                         </SelectItem>
                         <SelectItem value="long">
-                          Longa (mais de 100 minutos)
+                          {getDurationCategoryLabel("long")}
                         </SelectItem>
                       </SelectContent>
                     </Select>

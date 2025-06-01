@@ -9,6 +9,7 @@ export type Movie = {
   budget: number;
   imageUrl: string;
   duration: number;
+  genre: MovieGenre;
 };
 
 export type CreateMoviePayload = Omit<Movie, "id" | "createdAt" | "updatedAt">;
@@ -36,21 +37,21 @@ export type GetMoviesResponse = {
 };
 
 export const MovieGenre = {
-  ACTION: 'Action',
-  COMEDY: 'Comedy',
-  DRAMA: 'Drama',
-  FANTASY: 'Fantasy',
-  HORROR: 'Horror',
-  MYSTERY: 'Mystery',
-  ROMANCE: 'Romance',
-  THRILLER: 'Thriller',
-  SCI_FI: 'Sci-Fi',
-  ANIMATION: 'Animation',
-  DOCUMENTARY: 'Documentary',
-  FAMILY: 'Family',
-  CRIME: 'Crime',
-  ADVENTURE: 'Adventure',
-  OTHER: 'Other',
+  ACTION: "Action",
+  COMEDY: "Comedy",
+  DRAMA: "Drama",
+  FANTASY: "Fantasy",
+  HORROR: "Horror",
+  MYSTERY: "Mystery",
+  ROMANCE: "Romance",
+  THRILLER: "Thriller",
+  SCI_FI: "Sci-Fi",
+  ANIMATION: "Animation",
+  DOCUMENTARY: "Documentary",
+  FAMILY: "Family",
+  CRIME: "Crime",
+  ADVENTURE: "Adventure",
+  OTHER: "Other",
 } as const;
 
-export type MovieGenre = typeof MovieGenre[keyof typeof MovieGenre];
+export type MovieGenre = (typeof MovieGenre)[keyof typeof MovieGenre];

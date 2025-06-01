@@ -71,6 +71,7 @@ export function UpdateMovieFormDialog({ movie }: Props) {
     imageUrl,
     duration,
     releaseDate,
+    genre,
   } = movie;
 
   const queryClient = useQueryClient();
@@ -84,6 +85,7 @@ export function UpdateMovieFormDialog({ movie }: Props) {
       imageUrl,
       duration,
       releaseDate: new Date(releaseDate),
+      genre,
     },
   });
 

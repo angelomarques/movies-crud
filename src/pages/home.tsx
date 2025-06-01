@@ -1,4 +1,5 @@
 import { CreateMovieFormDialog } from "@/components/create-movie-form-dialog";
+import { DeleteConfirmationDialog } from "@/components/delete-movie-confimation-dialog";
 import { FilterFormDialog } from "@/components/filter-form-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -88,6 +89,8 @@ const columns: ColumnDef<Movie>[] = [
     cell: (row) => {
       // eslint-disable-next-line react-hooks/rules-of-hooks
       const selectMovie = useMovieStore((state) => state.setSelected);
+      // eslint-disable-next-line react-hooks/rules-of-hooks
+      const deleteMovie = useMovieStore((state) => state.setToDelete);
 
       return (
         <DropdownMenu>
@@ -101,8 +104,9 @@ const columns: ColumnDef<Movie>[] = [
             <DropdownMenuItem onClick={() => selectMovie(row.row.original)}>
               Editar
             </DropdownMenuItem>
-            <DropdownMenuItem>Visualizar</DropdownMenuItem>
-            <DropdownMenuItem>Excluir</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => deleteMovie(row.row.original)}>
+              Excluir
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       );
@@ -127,6 +131,7 @@ export function HomePage() {
   const searchTitleValue = useDebounce(searchTitle);
 
   const selectedMovie = useMovieStore((state) => state.selected);
+  const movieToDelete = useMovieStore((state) => state.toDelete);
 
   const { data: moviesQuery } = useGetMoviesQuery({
     page: pagination.pageIndex + 1,
@@ -325,6 +330,13 @@ export function HomePage() {
 
       {selectedMovie && (
         <UpdateMovieFormDialog movie={selectedMovie} key={selectedMovie.id} />
+      )}
+
+      {movieToDelete && (
+        <DeleteConfirmationDialog
+          movieId={movieToDelete.id}
+          key={movieToDelete.id}
+        />
       )}
     </div>
   );

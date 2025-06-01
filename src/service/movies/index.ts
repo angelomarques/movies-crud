@@ -34,3 +34,9 @@ export async function updateMovie(id: string, payload: CreateMoviePayload) {
 
   return data;
 }
+
+export async function deleteMovie(id: string) {
+  const { data } = await api.delete<Movie>(`/movies/${id}`);
+
+  return data;
+}

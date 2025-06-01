@@ -18,14 +18,15 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { UpdateMovieFormDialog } from "@/components/update-movie-form-dialog";
 import { useDebounce } from "@/hooks/use-debounce";
 import { formatBRL, getDurationCategoryLabel } from "@/lib/utils";
 import { useGetMoviesQuery } from "@/service/movies/queries";
 import type { DurationCategory, Movie } from "@/service/movies/types";
+import { useMovieStore } from "@/store/movie";
 import type {
   ColumnDef,
   ColumnFiltersState,
-  SortingState,
   VisibilityState,
 } from "@tanstack/react-table";
 import {
@@ -38,23 +39,15 @@ import {
 } from "@tanstack/react-table";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { ArrowUpDown, ChevronDown, MoreHorizontal } from "lucide-react";
+import { ChevronDown, MoreHorizontal } from "lucide-react";
 import { useQueryState } from "nuqs";
 import { useState } from "react";
 
 const columns: ColumnDef<Movie>[] = [
   {
     accessorKey: "title",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Título
-          <ArrowUpDown />
-        </Button>
-      );
+    header: () => {
+      return <div>Título</div>;
     },
     cell: ({ row }) => <div>{row.getValue("title")}</div>,
   },
@@ -92,7 +85,10 @@ const columns: ColumnDef<Movie>[] = [
   {
     id: "actions",
     enableHiding: false,
-    cell: () => {
+    cell: (row) => {
+      // eslint-disable-next-line react-hooks/rules-of-hooks
+      const selectMovie = useMovieStore((state) => state.setSelected);
+
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -102,7 +98,9 @@ const columns: ColumnDef<Movie>[] = [
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem>Editar</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => selectMovie(row.row.original)}>
+              Editar
+            </DropdownMenuItem>
             <DropdownMenuItem>Visualizar</DropdownMenuItem>
             <DropdownMenuItem>Excluir</DropdownMenuItem>
           </DropdownMenuContent>
@@ -113,7 +111,6 @@ const columns: ColumnDef<Movie>[] = [
 ];
 
 export function HomePage() {
-  const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
@@ -129,6 +126,8 @@ export function HomePage() {
   const [searchTitle, setSearchTitle] = useQueryState("search");
   const searchTitleValue = useDebounce(searchTitle);
 
+  const selectedMovie = useMovieStore((state) => state.selected);
+
   const { data: moviesQuery } = useGetMoviesQuery({
     page: pagination.pageIndex + 1,
     limit: pagination.pageSize,
@@ -141,7 +140,6 @@ export function HomePage() {
   const table = useReactTable({
     data: moviesQuery?.data || [],
     columns,
-    onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
@@ -153,7 +151,6 @@ export function HomePage() {
     manualPagination: true,
     rowCount: moviesQuery?.meta?.total,
     state: {
-      sorting,
       columnFilters,
       columnVisibility,
       rowSelection,
@@ -325,6 +322,10 @@ export function HomePage() {
           </Button>
         </div>
       </div>
+
+      {selectedMovie && (
+        <UpdateMovieFormDialog movie={selectedMovie} key={selectedMovie.id} />
+      )}
     </div>
   );
 }

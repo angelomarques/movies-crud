@@ -28,3 +28,9 @@ export async function createMovie(payload: CreateMoviePayload) {
 
   return data;
 }
+
+export async function updateMovie(id: string, payload: CreateMoviePayload) {
+  const { data } = await api.put<Movie>(`/movies/${id}`, payload);
+
+  return data;
+}

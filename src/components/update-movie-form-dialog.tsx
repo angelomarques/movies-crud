@@ -8,12 +8,16 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { useCreateMovieMutation } from "@/service/movies/mutations";
+import { handleUpload } from "@/service/files";
+import { useUpdateMovieMutation } from "@/service/movies/mutations";
+import type { Movie } from "@/service/movies/types";
+import { useMovieStore } from "@/store/movie";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
+import { DatePicker } from "./ui/date-picker";
 import {
   Dialog,
   DialogContent,
@@ -21,13 +25,9 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "./ui/dialog";
 import { Textarea } from "./ui/textarea";
-import { DatePicker } from "./ui/date-picker";
 import { UploadInput } from "./ui/upload";
-import { handleUpload } from "@/service/files";
-import { useQueryClient } from "@tanstack/react-query";
 
 const formSchema = z.object({
   title: z.string({ required_error: "Campo obrigatório" }).min(2, {
@@ -51,30 +51,48 @@ const formSchema = z.object({
 
 type FormSchemaType = z.infer<typeof formSchema>;
 
-export function CreateMovieFormDialog() {
+interface Props {
+  movie: Movie;
+}
+
+export function UpdateMovieFormDialog({ movie }: Props) {
+  const {
+    id,
+    title,
+    originalTitle,
+    description,
+    budget,
+    imageUrl,
+    duration,
+    releaseDate,
+  } = movie;
+
   const queryClient = useQueryClient();
   const form = useForm<FormSchemaType>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      title: "",
-      originalTitle: "",
-      description: "",
-      budget: 0,
-      imageUrl: "",
-      duration: 0,
+      title,
+      originalTitle,
+      description,
+      budget: Number(budget),
+      imageUrl,
+      duration,
+      releaseDate: new Date(releaseDate),
     },
   });
 
-  const [isOpen, setIsOpen] = useState(false);
+  const selectMovie = useMovieStore((state) => state.setSelected);
 
-  function closeModal() {
-    setIsOpen(false);
+  function onOpenChange(open: boolean) {
+    if (!open) {
+      selectMovie(null);
+    }
   }
 
-  const { mutateAsync, isPending } = useCreateMovieMutation({
+  const { mutateAsync, isPending } = useUpdateMovieMutation(id, {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["movies"] });
-      closeModal();
+      onOpenChange(false);
       form.reset();
     },
   });
@@ -83,9 +101,9 @@ export function CreateMovieFormDialog() {
     const dateToString = values.releaseDate.toISOString();
 
     toast.promise(() => mutateAsync({ ...values, releaseDate: dateToString }), {
-      success: "Filme Cadastrado realizado com sucesso",
+      success: "Filme Atualizado com sucesso",
       loading: "Carregando...",
-      error: "Houve um erro ao cadastrar o filme. Tente novamente mais tarde",
+      error: "Houve um erro ao atualizar o filme. Tente novamente mais tarde",
     });
   }
 
@@ -105,16 +123,12 @@ export function CreateMovieFormDialog() {
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger asChild>
-        <Button>Criar Filme</Button>
-      </DialogTrigger>
-
+    <Dialog open={true} onOpenChange={onOpenChange}>
       <DialogContent className="h-screen overflow-y-scroll">
         <DialogHeader>
-          <DialogTitle>Criar Filme</DialogTitle>
+          <DialogTitle>Editar Filme</DialogTitle>
           <DialogDescription>
-            Digite os dados do filme para cadastrá-lo na plataforma
+            Atualize as informações do filme preenchendo os campos abaixo.
           </DialogDescription>
         </DialogHeader>
 
@@ -252,6 +266,7 @@ export function CreateMovieFormDialog() {
                       acceptedFileTypes=".jpg,.jpeg,.png"
                       customFileName="capa"
                       maxFiles={1}
+                      initialFileKeys={field.value ? [field.value] : []}
                     />
                     <FormControl>
                       <Input

@@ -18,6 +18,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useDebounce } from "@/hooks/use-debounce";
 import { formatBRL, getDurationCategoryLabel } from "@/lib/utils";
 import { useGetMoviesQuery } from "@/service/movies/queries";
 import type { DurationCategory, Movie } from "@/service/movies/types";
@@ -40,7 +41,6 @@ import { ptBR } from "date-fns/locale";
 import { ArrowUpDown, ChevronDown, MoreHorizontal } from "lucide-react";
 import { useQueryState } from "nuqs";
 import { useState } from "react";
-import { start } from "repl";
 
 const columns: ColumnDef<Movie>[] = [
   {
@@ -126,6 +126,8 @@ export function HomePage() {
   const [endDate, setEndDate] = useQueryState("endDate");
   const [durationCategory, setDurationCategory] =
     useQueryState("durationCategory");
+  const [searchTitle, setSearchTitle] = useQueryState("search");
+  const searchTitleValue = useDebounce(searchTitle);
 
   const { data: moviesQuery } = useGetMoviesQuery({
     page: pagination.pageIndex + 1,
@@ -133,6 +135,7 @@ export function HomePage() {
     startDate: startDate ?? undefined,
     endDate: endDate ?? undefined,
     durationCategory: durationCategory as DurationCategory | undefined,
+    search: searchTitleValue ?? undefined,
   });
 
   const table = useReactTable({
@@ -158,8 +161,6 @@ export function HomePage() {
     },
   });
 
-  console.log("start date", startDate);
-
   function clearFilters() {
     setStartDate(null);
     setEndDate(null);
@@ -174,10 +175,8 @@ export function HomePage() {
         <div className="flex gap-2 items-center">
           <Input
             placeholder="Pesquisar título..."
-            value={(table.getColumn("title")?.getFilterValue() as string) ?? ""}
-            onChange={(event) =>
-              table.getColumn("title")?.setFilterValue(event.target.value)
-            }
+            value={searchTitle ?? ""}
+            onChange={(event) => setSearchTitle(event.target.value)}
             className="max-w-sm"
           />
 

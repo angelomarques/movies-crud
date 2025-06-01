@@ -7,15 +7,16 @@ import type {
 } from "./types";
 
 export async function getMovies(params: GetMoviesParams = {}) {
-  const { page, limit, startDate, endDate, durationCategory } = params;
+  const { page, limit, startDate, endDate, durationCategory, search } = params;
 
   const { data } = await api.get<GetMoviesResponse>("/movies", {
     params: {
       page: page || 1,
       limit: limit || 10,
-      startDate: startDate,
-      endDate: endDate,
-      durationCategory: durationCategory,
+      startDate,
+      endDate,
+      durationCategory,
+      search,
     },
   });
 

@@ -23,6 +23,7 @@ export type GetMoviesParams = {
   startDate?: string;
   endDate?: string;
   durationCategory?: DurationCategory;
+  search?: string;
 };
 
 export type GetMoviesResponse = {

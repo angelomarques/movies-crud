@@ -1,0 +1,17 @@
+export const movieGenresOptions = [
+  { value: "Action", label: "Ação" },
+  { value: "Comedy", label: "Comédia" },
+  { value: "Drama", label: "Drama" },
+  { value: "Fantasy", label: "Fantasia" },
+  { value: "Horror", label: "Terror" },
+  { value: "Mystery", label: "Mistério" },
+  { value: "Romance", label: "Romance" },
+  { value: "Thriller", label: "Suspense" },
+  { value: "Sci-Fi", label: "Ficção Científica" },
+  { value: "Animation", label: "Animação" },
+  { value: "Documentary", label: "Documentário" },
+  { value: "Family", label: "Família" },
+  { value: "Crime", label: "Crime" },
+  { value: "Adventure", label: "Aventura" },
+  { value: "Other", label: "Outro" },
+];

@@ -10,7 +10,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { handleUpload } from "@/service/files";
 import { useUpdateMovieMutation } from "@/service/movies/mutations";
-import type { Movie } from "@/service/movies/types";
+import { MovieGenre, type Movie } from "@/service/movies/types";
 import { useMovieStore } from "@/store/movie";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQueryClient } from "@tanstack/react-query";
@@ -28,6 +28,9 @@ import {
 } from "./ui/dialog";
 import { Textarea } from "./ui/textarea";
 import { UploadInput } from "./ui/upload";
+import { Select, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
+import { SelectContent } from "@radix-ui/react-select";
+import { movieGenresOptions } from "@/service/movies/data";
 
 const formSchema = z.object({
   title: z.string({ required_error: "Campo obrigatório" }).min(2, {
@@ -47,6 +50,9 @@ const formSchema = z.object({
   duration: z
     .number({ required_error: "Campo obrigatório" })
     .min(1, { message: "O orçamento deve ser maior que 1" }),
+  genre: z.nativeEnum(MovieGenre, {
+    required_error: "Campo obrigatório",
+  }),
 });
 
 type FormSchemaType = z.infer<typeof formSchema>;
@@ -275,6 +281,35 @@ export function UpdateMovieFormDialog({ movie }: Props) {
                         {...field}
                       />
                     </FormControl>
+
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="genre"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Gênero</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Selecione o gênero" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {movieGenresOptions.map((option) => (
+                          <SelectItem key={option.value} value={option.value}>
+                            {option.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
 
                     <FormMessage />
                   </FormItem>

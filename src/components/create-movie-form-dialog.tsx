@@ -28,6 +28,15 @@ import { DatePicker } from "./ui/date-picker";
 import { UploadInput } from "./ui/upload";
 import { handleUpload } from "@/service/files";
 import { useQueryClient } from "@tanstack/react-query";
+import { MovieGenre } from "@/service/movies/types";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "./ui/select";
+import { movieGenresOptions } from "@/service/movies/data";
 
 const formSchema = z.object({
   title: z.string({ required_error: "Campo obrigatório" }).min(2, {
@@ -47,6 +56,9 @@ const formSchema = z.object({
   duration: z
     .number({ required_error: "Campo obrigatório" })
     .min(1, { message: "O orçamento deve ser maior que 1" }),
+  genre: z.nativeEnum(MovieGenre, {
+    required_error: "Campo obrigatório",
+  }),
 });
 
 type FormSchemaType = z.infer<typeof formSchema>;
@@ -260,6 +272,35 @@ export function CreateMovieFormDialog() {
                         {...field}
                       />
                     </FormControl>
+
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="genre"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Gênero</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Selecione o gênero" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {movieGenresOptions.map((option) => (
+                          <SelectItem key={option.value} value={option.value}>
+                            {option.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
 
                     <FormMessage />
                   </FormItem>
